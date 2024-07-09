@@ -17,7 +17,7 @@ If you need to deploy a client-specific application, open that client in the adm
   * **Upgrade Code**: `25fd42bc-9ea5-5754-99f5-9811da79ebf1`
 ## Scripts
 * **Installation**: `#TBD - Thread Messenger Installation Script - (Local)`
-  * Select `+ New` and paste the [Thread Messenger Installation Script](./Thread%20Messenger/Thread%20Messenger%20Installation%20Script.ps1)
+  * Select `+ New` and paste the [Thread Messenger Installation Script](./Thread%20Messenger%20Installation%20Script.ps1)
   * **Script Execution Context**: `System`
 * **Uninstallation**: `#993 - Uninstall MSI By UpgradeCode - (Global)`
   * Select the dropdown and search for `Uninstall MSI By UpgradeCode` in the global repository.
@@ -31,4 +31,4 @@ If you need to deploy a client-specific application, open that client in the adm
 ## Advanced Settings
 * **Dynamic Versions**: `#TBD - Thread Messenger Dynamic Versions Script - (Local)`
   * Select the checkbox for `Use dynamic versions`
-  * Select `+ New` and paste the [Thread Messenger Dynamic Versions Script](./Thread%20Messenger/Thread%20Messenger%20Dynamic%20Versions%20Script.ps1)
+  * Select `+ New` and paste the [Thread Messenger Dynamic Versions Script](./Thread%20Messenger%20Dynamic%20Versions%20Script.ps1)
