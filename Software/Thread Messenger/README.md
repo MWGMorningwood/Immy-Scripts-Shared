@@ -4,6 +4,10 @@ You should already have your application ID from the [Messenger Installation](ht
 If you need to deploy a client-specific application, open that client in the admin center and use the application ID from there.  
 [Understand the difference between Partner-level and Customer-level deployments](https://docs.getthread.com/article/2a21yr4emf-how-do-i-override-messenger-branding-and-configuration-for-a-customer).
 
+> [!WARNING]  
+> The scripts involved rely on immy.bot metascript functions that are only available in immy.bot.  
+> This repository is for immy-specific PowerShell, and a generic version may be added elsewhere.
+
 # Deployment Settings
 ## Software Info
 * **Name**: `Thread Messenger`
