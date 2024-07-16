@@ -6,10 +6,12 @@ HelpMessage formatting supports MarkDown.
 [String]$list="stuff1,stuff2" #<- setting the variable here serves as a default for the parameter.
 )
 
+$splitList = $list -split ','
+
 ######################################################################################
 # Add commands that need to be run regardless of phase here (run in test AND set)
 # Common use-cases would be something like importing a module, defining a function,
-# or `Connect-{Provider}`
+# modifying variables, or `Connect-{Provider}`
 ######################################################################################
 
 switch($method){ # $method contains the current phase immy is in, values are test, set
