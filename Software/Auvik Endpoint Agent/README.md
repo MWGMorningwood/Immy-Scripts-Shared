@@ -19,6 +19,12 @@ This agent is meant to sit on endpoints to collect more data from the endpoint a
 * **Uninstallation**: `#993 - Uninstall MSI by Upgrade Code - (Global)`
   * Select the dropdown and search for `Uninstall Software by Detection String` in the global repository.
 * **Upgrade Strategy**: `Uninstall/Install` (as many existing installs will be EXE-based.)
+* **Configuration Task**: `#TBD - Auvik Endpoint Agent Configuration Task - (Local)`
+  * Select `+ New`
+  * Add a `Parameter`:
+    * **Name**: `siteKey`
+    * **Data Type**: `Text`
+    * Select `Create Maintenance Task`
 ## Advanced Settings
 * **Dynamic Versions**: `#TBD - Auvik Endpoint Agent Dynamic Versions Script - (Local)`
   * Select the checkbox for `Use dynamic versions`
