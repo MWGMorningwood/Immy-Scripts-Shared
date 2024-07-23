@@ -19,7 +19,7 @@ We encourage all community members to contribute to the library. Here are some g
 **Pull Requests**: Submit your contributions via pull requests. Provide a detailed description of what your script does and any dependencies it may have. PRs to main will not be accepted.  
 **Respect and Collaboration**: Be respectful and open to feedback from other community members. Collaboration is key to building a robust script library.  
 
-**Variables**: Should be in CamelCase.  
+**Variables**: Should be in [CamelCase](https://en.wikipedia.org/wiki/Camel_case).  
 **Indentation**: Should be done with four spaces.  
 **Bracing**: Should be done with [K&R OTBS](https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81#issuecomment-285835313)  
 
