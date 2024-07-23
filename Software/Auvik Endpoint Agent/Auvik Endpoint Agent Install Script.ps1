@@ -1,7 +1,7 @@
 <#
   Software: Auvik Endpoint Agent
-  Step: Installation
-  Type: Metascript
+  Type: Installation
+  Context: Metascript
 #>
 
 $params = @{
