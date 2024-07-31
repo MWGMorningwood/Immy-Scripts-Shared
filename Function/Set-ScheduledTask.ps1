@@ -45,7 +45,7 @@ function Set-ScheduledTaskScript {
         if(-not (test-path $using:scriptDir)){
             New-Item -Path $using:scriptDir -ItemType Directory | Out-Null 
         }
-        New-Item -Path $using:scriptPath -Name "$TaskName.ps1" -Value $ScriptContent -force
+        New-Item $using:scriptPath -Value $ScriptContent -force
     }
     Write-Host $Set_ScheduledTaskScript_result
 }
