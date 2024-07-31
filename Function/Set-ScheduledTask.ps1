@@ -107,7 +107,7 @@ switch ($method) {
                 Unregister-ScheduledTask -TaskName $using:TaskName -Confirm:$false 
             }
             # Build the task
-            $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -file `"$using:scriptPath`""
+            $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -file `"$using:scriptPath`""
             $principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Users" -RunLevel limited
             #$User = "NT AUTHORITY\INTERACTIVE"
             #$principal = New-ScheduledTaskPrincipal -UserId $User -LogonType Interactive
