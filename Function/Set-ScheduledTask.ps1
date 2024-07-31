@@ -45,10 +45,7 @@ function Set-ScheduledTaskScript {
         if(-not (test-path $using:scriptDir)){
             New-Item -Path $using:scriptDir -ItemType Directory | Out-Null 
         }
-        # Convert the script block to a string and set .ps1 file
-        $ScriptContent = $using:ScriptContent
-        $ScriptContentString = $ScriptContent.ToString()
-        $ScriptContentString | Out-File $using:scriptPath -force -Encoding utf8
+        New-Item -Path $using:scriptPath -Name "$TaskName.ps1" -Value $ScriptContent -force
     }
     Write-Host $Set_ScheduledTaskScript_result
 }
@@ -72,10 +69,10 @@ switch ($method) {
         }
 
         $Test_ScriptResult = Test-ScheduledTaskScript
-        Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Script Comparison finished with result $Test_ScriptResult" -PercentComplete 75 -Id 1
+        Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Script Comparison finished with result: $Test_ScriptResult" -PercentComplete 75 -Id 1
         
         $Test_DescResult = ( $task.Description -eq $TaskDesc )
-        Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Description Comparison finished with result $Test_DescResult" -PercentComplete 80 -Id 1
+        Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Description Comparison finished with result: $Test_DescResult" -PercentComplete 80 -Id 1
 
         $TestResult = ( $Test_DescResult -and $Test_ScriptResult )
         Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Validation finished with result: $TestResult" -Completed -Id 1
