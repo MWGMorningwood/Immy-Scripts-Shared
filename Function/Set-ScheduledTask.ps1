@@ -32,11 +32,16 @@ function Test-ScheduledTaskScript {
     if ($null -eq $ScriptCompare) {
         # The contents are identical
         $Test_ScheduledTaskScript_result = $true
+        Write-Host "Scripts are identical... Proceeding to next step"
     } else {
         # The contents are not identical
         $Test_ScheduledTaskScript_result = $false
+        Write-Host "Script on Machine:"  
+        Write-Host $CurrentScriptContent
+        Write-Host "Scripts NOT identical... Proceeding to next step"
     }
     return $Test_ScheduledTaskScript_result
+    Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Script Comparison finished with result: $Test_ScriptResult" -PercentComplete 75 -Id 1
 }
 
 function Set-ScheduledTaskScript {
@@ -45,10 +50,7 @@ function Set-ScheduledTaskScript {
         if(-not (test-path $using:scriptDir)){
             New-Item -Path $using:scriptDir -ItemType Directory | Out-Null 
         }
-        # Convert the script block to a string and set .ps1 file
-        $ScriptContent = $using:ScriptContent
-        $ScriptContentString = $ScriptContent.ToString()
-        $ScriptContentString | Out-File $using:scriptPath -force -Encoding utf8
+        New-Item $using:scriptPath -Value $using:ScriptContent -force
     }
     Write-Host $Set_ScheduledTaskScript_result
 }
@@ -72,10 +74,9 @@ switch ($method) {
         }
 
         $Test_ScriptResult = Test-ScheduledTaskScript
-        Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Script Comparison finished with result $Test_ScriptResult" -PercentComplete 75 -Id 1
         
         $Test_DescResult = ( $task.Description -eq $TaskDesc )
-        Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Description Comparison finished with result $Test_DescResult" -PercentComplete 80 -Id 1
+        Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Description Comparison finished with result: $Test_DescResult" -PercentComplete 80 -Id 1
 
         $TestResult = ( $Test_DescResult -and $Test_ScriptResult )
         Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Validation finished with result: $TestResult" -Completed -Id 1
@@ -105,9 +106,8 @@ switch ($method) {
             if (![string]::IsNullOrWhiteSpace($using:task)){
                 Unregister-ScheduledTask -TaskName $using:TaskName -Confirm:$false 
             }
-
             # Build the task
-            $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -file `"$using:scriptPath`""
+            $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -file `"$using:scriptPath`""
             $principal = New-ScheduledTaskPrincipal -GroupId "BUILTIN\Users" -RunLevel limited
             #$User = "NT AUTHORITY\INTERACTIVE"
             #$principal = New-ScheduledTaskPrincipal -UserId $User -LogonType Interactive
@@ -121,7 +121,7 @@ switch ($method) {
         }
         Write-Progress -Activity "Setting Scheduled Task" -CurrentOperation "Task configured" -PercentComplete 95 -Id 2
         Write-Progress -Activity "Setting Scheduled Task" -CurrentOperation "Enforcement complete" -Completed -Id 2
-        Write-Information "INFO: Scheduled Task Results:"
+        Write-Host "INFO: Scheduled Task Results:"
         return $result
     }
 }
