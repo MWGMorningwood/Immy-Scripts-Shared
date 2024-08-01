@@ -2,7 +2,13 @@ param(
     [Parameter(Mandatory=$true, HelpMessage=@'
 Enter a comma separated list of allowed usernames. For example, if workstation\administrator and workstation\bob permitted, enter `administrator,bob`
 '@)]
-    [string]$allowedUsers
+    [string]$allowedUsers,
+    [Parameter(Mandatory=$false, HelpMessage=@'
+Toggle whether domain/workgroup users should be skipped.  
+`True` = Domain users will be evaluated and disabled if not allowed.  
+`False` = Domain users will not be evaluated, and are left alone.
+'@)]
+    [boolean]$skipDomain = $false
 )
 
 # Convert the comma-separated list of allowed users into an array
@@ -12,7 +18,11 @@ $allowedUsersArray = $allowedUsers -split ','
 function Get-LocalUsers {
     $users = Invoke-ImmyCommand {
         $result = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount=True" 
-        $filteredResult = $result | Where-Object { $_.Disabled -eq $false -and $_.LocalAccount -eq $true }
+        if($skipDomain){
+            $filteredResult = $result | Where-Object { $_.Disabled -eq $false -and $_.LocalAccount -eq $true }
+        } else {
+            $filteredResult = $result | Where-Object { $_.Disabled -eq $false }
+        }
         return $filteredResult
     }
     return $users
