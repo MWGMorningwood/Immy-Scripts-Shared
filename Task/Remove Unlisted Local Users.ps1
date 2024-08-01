@@ -1,5 +1,7 @@
 param(
-    [Parameter(Mandatory=$true, HelpMessage="Enter a comma separated list of allowed users.")]
+    [Parameter(Mandatory=$true, HelpMessage=@'
+Enter a comma separated list of allowed usernames. For example, if workstation\administrator and workstation\bob permitted, enter `administrator,bob`
+'@)]
     [string]$allowedUsers
 )
 
@@ -8,7 +10,12 @@ $allowedUsersArray = $allowedUsers -split ','
 
 # Function to get all local users
 function Get-LocalUsers {
-    Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount=True" | Where-Object { $_.Disabled -eq $false -and $_.LocalAccount -eq $true }
+    $users = Invoke-ImmyCommand {
+        $result = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount=True" 
+        $filteredResult = $result | Where-Object { $_.Disabled -eq $false -and $_.LocalAccount -eq $true }
+        return $filteredResult
+    }
+    return $users
 }
 
 # Function to test compliance
@@ -28,7 +35,10 @@ function Set-Compliance {
     foreach ($user in $localUsers) {
         if ($allowedUsersArray -notcontains $user.Name) {
             Write-Host "Disabling user: $($user.Name)"
-            Invoke-ImmyCommand -Command "Disable-LocalUser -Name $($user.Name)"
+            $userName = $user.Name
+            Invoke-ImmyCommand {
+                Disable-LocalUser -Name $using:userName
+            }
         }
     }
 }
