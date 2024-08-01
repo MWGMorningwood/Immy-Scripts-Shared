@@ -5,10 +5,10 @@ Enter a comma separated list of allowed usernames. For example, if workstation\a
     [string]$allowedUsers,
     [Parameter(Mandatory=$false, HelpMessage=@'
 Toggle whether domain/workgroup users should be skipped.  
-`True` = Domain users will be evaluated and disabled if not allowed.  
-`False` = Domain users will not be evaluated, and are left alone.
+`False` = Domain users will be evaluated and disabled if not allowed.  
+`True` = Domain users will not be evaluated, and are left alone.
 '@)]
-    [boolean]$skipDomain = $false
+    [boolean]$skipDomain = $true
 )
 
 # Convert the comma-separated list of allowed users into an array
