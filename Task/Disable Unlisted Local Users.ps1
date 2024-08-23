@@ -59,9 +59,11 @@ switch ($method) {
         $compliance = Test-Compliance
         if ($compliance) {
             Write-Host "All local users are compliant."
+            Write-Host $localUsers
             return $true
         } else {
             Write-Host "There are non-compliant local users."
+            Write-Host $localUsers
             return $false
         }
     }
