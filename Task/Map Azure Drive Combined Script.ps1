@@ -17,6 +17,11 @@ Array of drives to map at logon. Format is as follows:
 [Hashtable]$driveArray
 )
 
+### WARNING!################################################
+# Permissions to the share will be in the context of the `UserName` param in the try/catch block below.
+# If directory-specific permissions are in-place, you likely need to use IdP integration instead.
+############################################################
+
 #Relies on Set-ScheduledTask. This function is not included in immy.bot, but is included in this repo under the Functions folder.
 #net use Q: $sharePath /persistent:yes <- old script
 

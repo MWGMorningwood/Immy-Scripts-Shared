@@ -14,16 +14,17 @@ Until we're allowed to PR into global, this is our solution!
 ## Contribution Guidelines
 We encourage all community members to contribute to the library. Here are some general guidelines to help you get started:
 
-**Quality and Clarity**: Ensure your scripts are well-documented and easy to understand. Include comments and explanations where necessary.  
-**Testing**: Test your scripts thoroughly before submitting them. Make sure they work as intended and do not cause any unintended side effects.  
-**Pull Requests**: Submit your contributions via pull requests. Provide a detailed description of what your script does and any dependencies it may have. PRs to main will not be accepted.  
-**Respect and Collaboration**: Be respectful and open to feedback from other community members. Collaboration is key to building a robust script library.  
+### Practices
+* **Quality and Clarity**: Ensure your scripts are well-documented and easy to understand. Include comments where necessary.  
+* **Testing**: Test your scripts thoroughly before submitting. Make sure they work as intended and do not cause any unintended side effects.  
+* **Pull Requests**: Submit your contributions via pull requests. Provide a detailed description of what your script does and any dependencies it may have. PRs to main will not be accepted.  
+* **Respect and Collaboration**: Be respectful and open to feedback from other community members. Collaboration is key to building a robust script library.
+* **Organization**: Scripts that have a common usage (like software install/uninstall/versioning) should be foldered by the item they are for.  
 
-**Variables**: Should be in [CamelCase](https://en.wikipedia.org/wiki/Camel_case).  
-**Indentation**: Should be done with four spaces.  
-**Bracing**: Should be done with [K&R OTBS](https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81#issuecomment-285835313)  
-
-**Organization**: Scripts that have a common usage (like software install/uninstall/versioning) should be foldered based on the item they are for.  
+### Standards
+* **Variables**: Should be in [CamelCase](https://en.wikipedia.org/wiki/Camel_case).  
+* **Indentation**: Should be done with four spaces.  
+* **Bracing**: Should be done with [K&R OTBS](https://github.com/PoshCode/PowerShellPracticeAndStyle/issues/81#issuecomment-285835313)  
 
 ## Definitions and Terminology
 **Script Context**:
