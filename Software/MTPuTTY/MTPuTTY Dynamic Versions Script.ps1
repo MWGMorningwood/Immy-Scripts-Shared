@@ -1,0 +1,1 @@
+Get-DynamicVersionFromInstallerURL "https://ttyplus.com/download/mtputty_setup.exe"
