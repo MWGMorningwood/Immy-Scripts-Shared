@@ -1,7 +1,7 @@
-<# 
+<#
 Modified from the Immy Default Inno Setup Install Script
 Needed to add /ALLUSERS
-#> 
+#>
 
 $Arguments = @"
 /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /ALLUSERS /LOG="$InstallerLogFile"
