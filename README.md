@@ -19,4 +19,4 @@ Until we're allowed to PR into global, this is our solution!
   * User: A script that executes locally in the endpoint's logged-in user's context.
 
 ## Contributing
-If you'd like to give us a hand maintaining these scripts, stop by the [Contributing](./CONTRIBUTING.md) to learn how.
+If you'd like to give us a hand maintaining these scripts, stop by the [Contributing](./CONTRIBUTING.md) page to learn how.
