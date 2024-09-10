@@ -12,7 +12,7 @@ $Integration = New-DynamicIntegration -Init {
         [String]$RegistrationWebhook,
 
         [Parameter(Mandatory = $true, HelpMessage='Org Secret set in Rewst')]
-        [Password(StripValue = $false)]$RegistrationSecret,
+        [String]$RegistrationSecret,
 
         [Parameter(Mandatory = $true, HelpMessage='URL of `Get_Orgs` trigger of the Foghorn Workflow')]
         [String]$OrgWebhook,
@@ -45,7 +45,6 @@ $Integration = New-DynamicIntegration -Init {
     Import-Module AgentSmithAPI
     Get-SmithAPIHealth
 }
-
 
 $Integration | Add-DynamicIntegrationCapability -Interface ISupportsListingClients -GetClients {
     [ScriptTimeout(TimeoutSeconds = 300)]
@@ -84,7 +83,7 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsListingAgent
 
     $currentTime = Get-Date
 
-    Get-SmithAgent | % {
+    Get-SmithAgent | ForEach-Object {
         $timestampDateTime = [DateTime]::Parse($_.Timestamp)
         $timeDifference = $currentTime - $timestampDateTime
         $online = ($timeDifference.TotalMinutes -le 5)
@@ -99,7 +98,6 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsListingAgent
     }
 }
 
-
 $Integration | Add-DynamicIntegrationCapability -Interface ISupportsInventoryIdentification -GetInventoryScript {
     [CmdletBinding()]
     [OutputType([scriptblock])]
@@ -108,7 +106,7 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsInventoryIde
     )
     Invoke-ImmyCommand {
         # implement a script block that should retrieve the agent identifier for this integration.
-        Get-Content "C:\ProgramData\RewstRemoteAgent\*\config.json" | ConvertFrom-Json | % {$_.device_id}
+        Get-Content "C:\ProgramData\RewstRemoteAgent\*\config.json" | ConvertFrom-Json | ForEach-Object {$_.device_id}
     }
 }
 
@@ -143,17 +141,22 @@ $Integration |  Add-DynamicIntegrationCapability -Interface ISupportsTenantInsta
 }
 
 $Integration | Add-DynamicIntegrationCapability -Interface IRunScriptProvider -RunScript {
+    [CmdletBinding()]
+    [OutputType([string])]
     param(
         [Parameter(Mandatory)]
         [IProviderAgentDetails]$agent,
         [Parameter(Mandatory)]
         [string]$scriptCode,
         [Parameter(Mandatory)]
-        [int]$timeout
+        [ScriptLanguage]$scriptLanguage,
+        [Parameter(Mandatory)]
+        [int]$timeout,
+        [Parameter(Mandatory)]
+        [string]$scriptPath
     )
     Import-Module AgentSmithAPI
-    Invoke-SmithCommand
+    Invoke-SmithCommand -agent $agent.ExternalAgentId -scriptCode $scriptCode
 } -get_DefaultTimeout { 600 }
-
 
 $Integration
