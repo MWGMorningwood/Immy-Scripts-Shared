@@ -54,7 +54,7 @@ Base RegKey:
 [Parameter(Position=5,Mandatory=$False,HelpMessage=@'
 Disable IPv4 source routing
 
-* `2` = Disables IP Source Route processing. 
+* `2` = Disables IP Source Route processing.
 * `$null` = Remove the RegKey, do not block Source Routing
 
 Base RegKey:
@@ -65,7 +65,7 @@ Base RegKey:
 [Parameter(Position=6,Mandatory=$False,HelpMessage=@'
 Disable IPv6 source routing
 
-* `2` = Disables IP Source Route processing. 
+* `2` = Disables IP Source Route processing.
 * `$null` = Remove the RegKey, do not block Source Routing
 
 Base RegKey:
