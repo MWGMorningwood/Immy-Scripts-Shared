@@ -45,7 +45,7 @@ function Set-Compliance {
     param()
     $localUsers = Get-LocalUsers
     foreach ($user in $localUsers) {
-        if (($allowedUsersArray -notcontains $user.Name) -and $PSCmdlet.ShouldProcess) {
+        if (($allowedUsersArray -notcontains $user.Name) -and $PSCmdlet.ShouldProcess($user.Name)) {
             Write-Host "Disabling user: $($user.Name)"
             $userName = $user.Name
             Invoke-ImmyCommand {
