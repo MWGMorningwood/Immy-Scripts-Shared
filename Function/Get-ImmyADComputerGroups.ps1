@@ -1,5 +1,5 @@
 param(
-    [string]$ComputerName, 
+    [string]$ComputerName,
     [string]$DomainName,
     [string]$PreferredDomainControllerName
 )
@@ -18,6 +18,8 @@ if ($ExistingComputer) {
                 Get-ADPrincipalGroupMembership (Get-ADComputer $using:ComputerName).DistinguishedName
             }
             catch {
+                Write-Error "Failed to get group membership for computer $($using:ComputerName): $_"
+                return @()
             }
         }
     }
