@@ -4,7 +4,6 @@
 
 $Integration = New-DynamicIntegration -Init {
     param(
-        
         [Parameter(Mandatory = $false, HelpMessage='URL of the repo containing Agent Smith releases')]
         [String]$GitRepoURL = 'https://github.com/RewstApp/rewst_remote_agent',
 
@@ -39,9 +38,8 @@ $Integration = New-DynamicIntegration -Init {
     $IntegrationContext.SmithRegistrationSecret = $RegistrationSecret
     $IntegrationContext.SmithGitRepoURL = $GitRepoURL
 
-
-    [OpResult]::Ok() 
-} -HealthCheck { 
+    [OpResult]::Ok()
+} -HealthCheck {
     Import-Module AgentSmithAPI
     Get-SmithAPIHealth
 }
@@ -50,7 +48,7 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsListingClien
     [ScriptTimeout(TimeoutSeconds = 300)]
     [CmdletBinding()]
     [OutputType([IProviderClientDetails[]])]
-    param() 
+    param()
     try{
         Import-Module AgentSmithAPI
         $Orgs = Get-SmithOrgID
@@ -101,9 +99,7 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsListingAgent
 $Integration | Add-DynamicIntegrationCapability -Interface ISupportsInventoryIdentification -GetInventoryScript {
     [CmdletBinding()]
     [OutputType([scriptblock])]
-    param(
-       
-    )
+    param()
     Invoke-ImmyCommand {
         # implement a script block that should retrieve the agent identifier for this integration.
         Get-Content "C:\ProgramData\RewstRemoteAgent\*\config.json" | ConvertFrom-Json | ForEach-Object {$_.device_id}
@@ -121,7 +117,6 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsDynamicVersi
     $version = Get-DynamicVersionsFromGitHubUrl `
     -GitHubReleasesUrl "$($IntegrationContext.SmithGitRepoURL)/releases" `
     -VersionsPattern ('(?<Uri>'+$IntegrationContext.SmithGitRepoURL+'/releases/download/v(?<Version>[\d\.]+)/(?<FileName>rewst_agent_config.win.exe))')
-    
     return $version.Versions
 }
 
