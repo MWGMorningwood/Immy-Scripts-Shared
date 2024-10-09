@@ -41,9 +41,11 @@ function Test-Compliance {
 
 # Function to disable non-allowed users
 function Set-Compliance {
+    [CmdletBinding(SupportsShouldProcess)]
+    param()
     $localUsers = Get-LocalUsers
     foreach ($user in $localUsers) {
-        if ($allowedUsersArray -notcontains $user.Name) {
+        if (($allowedUsersArray -notcontains $user.Name) -and $PSCmdlet.ShouldProcess($user.Name)) {
             Write-Host "Disabling user: $($user.Name)"
             $userName = $user.Name
             Invoke-ImmyCommand {
@@ -68,7 +70,7 @@ switch ($method) {
         }
     }
     'set' {
-        Set-Compliance
+        Set-Compliance -Confirm:$false
         Write-Host "Non-allowed local users have been disabled."
     }
     default {
