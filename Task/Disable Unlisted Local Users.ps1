@@ -15,9 +15,9 @@ Toggle whether domain/workgroup users should be skipped.
 $allowedUsersArray = $allowedUsers -split ','
 
 # Function to get all local users
-function Get-LocalUsers {
+function Get-UserList {
     $users = Invoke-ImmyCommand {
-        $result = Get-WmiObject -Class Win32_UserAccount -Filter "LocalAccount=True" 
+        $result = Get-LocalUser
         if($skipDomain){
             $filteredResult = $result | Where-Object { $_.Disabled -eq $false -and $_.LocalAccount -eq $true }
         } else {
@@ -30,7 +30,7 @@ function Get-LocalUsers {
 
 # Function to test compliance
 function Test-Compliance {
-    $localUsers = Get-LocalUsers
+    $localUsers = Get-UserList
     foreach ($user in $localUsers) {
         if ($allowedUsersArray -notcontains $user.Name) {
             return $false
@@ -43,7 +43,7 @@ function Test-Compliance {
 function Set-Compliance {
     [CmdletBinding(SupportsShouldProcess)]
     param()
-    $localUsers = Get-LocalUsers
+    $localUsers = Get-UserList
     foreach ($user in $localUsers) {
         if (($allowedUsersArray -notcontains $user.Name) -and $PSCmdlet.ShouldProcess($user.Name)) {
             Write-Host "Disabling user: $($user.Name)"
