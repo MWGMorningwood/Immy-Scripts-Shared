@@ -1,8 +1,10 @@
+# TODO: Refactor to be able to control multiple dell bios settings.
+# This script will set the BIOS setting for AutoOn to Everyday currently.
+# See the function for better context.
+
 Ensure-PSModulePresent DellBiosProvider
 $BIOSPath = "PowerManagement\AutoOn"
 $BIOSValue = "Everyday"
-#$method = "test"
-
 
 switch ($method) {
     "test" {
@@ -25,7 +27,6 @@ switch ($method) {
                 return $false
             }
         }
-        
     }
     "set" {
         #Enable-DellSMBIOS

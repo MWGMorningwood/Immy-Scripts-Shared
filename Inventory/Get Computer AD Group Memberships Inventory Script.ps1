@@ -10,7 +10,6 @@ $PartofDomain = Invoke-ImmyCommand { (Get-CimInstance win32_computersystem).Part
 if ($PartofDomain) {
     $groups = Get-ImmyADComputerGroups -ComputerName $ComputerName
     $($groups.name) -join "`r`n" | Out-String
-    
 } else {
     return $null
 }

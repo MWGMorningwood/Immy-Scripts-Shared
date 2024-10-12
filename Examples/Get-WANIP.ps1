@@ -1,2 +1,2 @@
-$MyIP = irm https://ifconfig.me/ip
+$MyIP = Invoke-RestMethod https://ifconfig.me/ip
 return $MyIP
