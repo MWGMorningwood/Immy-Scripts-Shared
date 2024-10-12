@@ -26,7 +26,7 @@ Invoke-ImmyCommand {
 
     #Check PSDrive
     try{
-        PSDrive -name "Dellsmbios" -ErrorAction Stop | Out-Null
+        Get-PSDrive -name "Dellsmbios" -ErrorAction Stop | Out-Null
         Write-Host "PS Drive Dellsmbios located."
     } catch {
         Write-Warning "PSDrive not found."

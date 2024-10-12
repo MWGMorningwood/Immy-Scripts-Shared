@@ -1,1 +1,1 @@
-Get-ImmyComputer -InventoryKeys WindowsSystemInfo | ?{$_.Inventory.WindowsSystemInfo.DSRegStatus.DeviceState.AzureADJoined -eq "YES"}
+Get-ImmyComputer -InventoryKeys WindowsSystemInfo | Where-Object {$_.Inventory.WindowsSystemInfo.DSRegStatus.DeviceState.AzureADJoined -eq "YES"}

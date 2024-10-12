@@ -14,18 +14,32 @@ $splitList = $list -split ','
 # modifying variables, or `Connect-{Provider}`
 ######################################################################################
 
-switch($method){ # $method contains the current phase immy is in, values are test, set
+switch ($method) { # $method contains the current phase immy is in, values are get, test, and set
   "test" {
     ##################################################################################
     # Add commands that need to be run to validate the current setting on the machine.
-    # Scripts should `return` either $true or $false to indicate COMPLIANCE
+    # Scripts should `return` either $TRUE or $FALSE to indicate COMPLIANCE
     ##################################################################################
+    Test-Function $splitList -Action {
+      if ($_ -notin $list){
+        return $false
+      } else {
+        return $true
+      }
+    }
   }
   "set" {
     ##################################################################################
-    # Add commands that need to be run when the test script returns $false
-    # The commands here should enforce settings and result in the test script returning $true
+    # Add commands that need to be run when the test script returns $FALSE
+    # The commands here should enforce DSC and result in the test script returning $TRUE
     ##################################################################################
+    Set-Function $splitList -Action {
+      For-each $thing in $splitList {
+        Do-ThingTo $thing
+        Write-Host "Did thing to $($thing.name)"
+      }
+    }
+
   }
   default {
     Write-Error 'Set a $method when testing, dummy!'

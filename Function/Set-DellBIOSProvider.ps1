@@ -35,7 +35,6 @@ switch ($method) {
                 return $false
             }
         }
-        
     }
     "set" {
         #Enable-DellSMBIOS

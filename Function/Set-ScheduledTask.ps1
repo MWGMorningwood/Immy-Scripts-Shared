@@ -66,7 +66,7 @@ switch ($method) {
 
         #Overall task comparison
         Write-Debug "DEBUG: Scheduled task: $task"
-        
+
         #Fail condition
         if ($null -eq $task) {
             Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Comparison failed - Task Missing" -Completed -Id 1
@@ -74,13 +74,13 @@ switch ($method) {
         }
 
         $Test_ScriptResult = Test-ScheduledTaskScript
-        
+
         $Test_DescResult = ( $task.Description -eq $TaskDesc )
         Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Description Comparison finished with result: $Test_DescResult" -PercentComplete 80 -Id 1
 
         $TestResult = ( $Test_DescResult -and $Test_ScriptResult )
         Write-Progress -Activity "Testing Scheduled Task" -CurrentOperation "Validation finished with result: $TestResult" -Completed -Id 1
-        
+
         $TestResult
     }
 
@@ -91,6 +91,7 @@ switch ($method) {
         if(!$Test_ScriptResult){
             $Set_ScriptResult = Set-ScheduledTaskScript
             Write-Progress -Activity "Setting Scheduled Task" -CurrentOperation "Enforced configured scriptblock" -PercentComplete 50 -Id 2
+            Write-Host $Set_ScriptResult
         }
         $result = Invoke-ImmyCommand {
             switch ($using:Trigger) {
@@ -101,7 +102,7 @@ switch ($method) {
             }
             Write-Debug "DEBUG: Trigger is set to $($using:Trigger)"
             Write-Debug "DEBUG: Build Trigger: $buildtrigger"
-            
+
             # Check if the task exists and remove it if it does
             if (![string]::IsNullOrWhiteSpace($using:task)){
                 Unregister-ScheduledTask -TaskName $using:TaskName -Confirm:$false 

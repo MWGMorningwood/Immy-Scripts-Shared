@@ -1,23 +1,14 @@
 <#
-Plug one of your domains into the $AzureDomain variable below
-
-Create a brand-new App Registration in Azure Active Directory, leave it completely unmodified, don’t change any defaults.
-
-Copy the Client (Application) ID into the $ClientID variable below
-
-Create a secret under Certificates and Secrets and copy the secret VALUE (NOT THE ID!!!!!!!) into the $Secret variable below
-
-Navigate to the Enterprise App that was created in your Azure AD (You can do this by clicking the Managed Application link on the bottom right of the App Registration) and copy the object id into the AD External ID field into a new Person in Immy
-
-Make that person a user
-
-Make the user an admin
-
-Run The code below
-
-Find the API endpoints you need by using the network tab in your browser.
-
-Modify the code below to suit your needs
+    Plug one of your domains into the $AzureDomain variable below
+    Create a brand-new App Registration in Azure Active Directory, leave it completely unmodified, don’t change any defaults.
+    Copy the Client (Application) ID into the $ClientID variable below
+    Create a secret under Certificates and Secrets and copy the secret VALUE (NOT THE ID!!!!!!!) into the $Secret variable below
+    Navigate to the Enterprise App that was created in your Azure AD (You can do this by clicking the Managed Application link on the bottom right of the App Registration) and copy the object id into the AD External ID field into a new Person in Immy
+    Make that person a user
+    Make the user an admin
+    Run The code below
+    Find the API endpoints you need by using the network tab in your browser.
+    Modify the code below to suit your needs
 #>
 
 $AzureDomain = ''
