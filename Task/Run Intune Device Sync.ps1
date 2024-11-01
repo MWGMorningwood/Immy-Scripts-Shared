@@ -10,14 +10,14 @@ Invoke-ImmyCommand -timeout 4800 {
         param()
         [Windows.Management.MdmSessionManager,Windows.Management,ContentType=WindowsRuntime]
         $session = [Windows.Management.MdmSessionManager]::TryCreateSession()
-        $session.StartAsync()  
+        $session.StartAsync()
         # $Session.State contains NotStarted, Communicating, and Completed
         while ($session.State -ne "Completed") {
             $session.State
             Start-Sleep 2
         }
     }
-    
+
     $Process = $ProcessJob | Receive-Job
     $Process
     Write-Host "$((Get-Date).ToString('s')) Streaming Intune Sync Events:"
@@ -41,7 +41,7 @@ Invoke-ImmyCommand -timeout 4800 {
             Start-Sleep -Seconds 10
             $LatestOutput = $LogJob | Receive-Job
         }
-        
+
         if ($PreviousOutput -eq $LatestOutput) {
             $LatestOutput + " (x$Count)" | Out-String | Write-Host
             $Count += 1
@@ -51,7 +51,7 @@ Invoke-ImmyCommand -timeout 4800 {
         }
         Remove-Job $LogJob
         $PreviousOutput = $LatestOutput
-        
+
     } while ( (Get-Job -Id $ProcessJob.Id).State -eq 'Running' )
     $Test = $false
     Write-Host "Waiting for closing event (this could be a few minutes):`n"
