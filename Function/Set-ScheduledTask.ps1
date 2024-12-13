@@ -91,7 +91,6 @@ switch ($method) {
         if(!$Test_ScriptResult){
             $Set_ScriptResult = Set-ScheduledTaskScript
             Write-Progress -Activity "Setting Scheduled Task" -CurrentOperation "Enforced configured scriptblock" -PercentComplete 50 -Id 2
-            Write-Host $Set_ScriptResult
         }
         $result = Invoke-ImmyCommand {
             switch ($using:Trigger) {
