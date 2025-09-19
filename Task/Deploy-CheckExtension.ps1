@@ -1,31 +1,31 @@
 <#!
-.SYNOPSIS
-    Compliance Task to enforce (or remove) CyberDrain "Check - Phishing Protection" extension policies for Chrome & Edge using ImmyBot registry helper functions.
-.DESCRIPTION
-    Combined task to deploy https://github.com/CyberDrain/Check.
-    Uses ImmyBot provided helper cmdlets `Get-WindowsRegistryValue` and `RegistryShould-Be` to automatically perform
-    test vs set logic based on `$method` for the Present (enforce) scenario. For Absent we manually ensure keys are
-    removed. This eliminates custom diff logic and leans on native ImmyBot compliance primitives.
+    .SYNOPSIS
+        Compliance Task to enforce (or remove) CyberDrain "Check - Phishing Protection" extension policies for Chrome & Edge using ImmyBot registry helper functions.
+    .DESCRIPTION
+        Combined task to deploy https://github.com/CyberDrain/Check.
+        Uses ImmyBot provided helper cmdlets `Get-WindowsRegistryValue` and `RegistryShould-Be` to automatically perform
+        test vs set logic based on `$method` for the Present (enforce) scenario. For Absent we manually ensure keys are
+        removed. This eliminates custom diff logic and leans on native ImmyBot compliance primitives.
 
-    Chosen as a Task (not Software) because there is no discrete installable artifact nor version detection; we only
-    enforce policy keys that force deployment & configuration of the browser extensions. Extensions self-update via
-    their web stores using the configured update_url.
+        Chosen as a Task (not Software) because there is no discrete installable artifact nor version detection; we only
+        enforce policy keys that force deployment & configuration of the browser extensions. Extensions self-update via
+        their web stores using the configured update_url.
 
-.PARAMETER Method
-  (Injected by ImmyBot) Specifies phase: 'test' or 'set'. When running outside ImmyBot you can pass -Method test|set.
-.PARAMETER Ensure
-  'Present' to enforce policy (default). 'Absent' to remove the policy keys (effectively un-managing the extension).
-.PARAMETER ChromeExtensionId / EdgeExtensionId
-  The extension IDs to manage. Defaults to known IDs.
-.PARAMETER ChromeUpdateUrl / EdgeUpdateUrl
-  The update service endpoints.
-.PARAMETER ShowNotifications ... (etc)
-  Integer 0/1 toggles matching extension managed storage interpretation.
+    .PARAMETER Method
+    (Injected by ImmyBot) Specifies phase: 'test' or 'set'. When running outside ImmyBot you can pass -Method test|set.
+    .PARAMETER Ensure
+    'Present' to enforce policy (default). 'Absent' to remove the policy keys (effectively un-managing the extension).
+    .PARAMETER ChromeExtensionId / EdgeExtensionId
+    The extension IDs to manage. Defaults to known IDs.
+    .PARAMETER ChromeUpdateUrl / EdgeUpdateUrl
+    The update service endpoints.
+    .PARAMETER ShowNotifications ... (etc)
+    Integer 0/1 toggles matching extension managed storage interpretation.
 
-.NOTES
+    .NOTES
+    For Immy purposes, add this script as a Combined Task with Script Parameters enabled.
     Returns [bool] during test phase. In set phase writes summary output (Absent) or relies on helper output (Present).
-  Validates inputs (color hex, interval range). All registry writes are HKLM so run in System context.
-
+    Validates inputs (color hex, interval range). All registry writes are HKLM so run in System context.
 #>
 [CmdletBinding(SupportsShouldProcess=$false)]
 param(
@@ -133,7 +133,7 @@ Write-Host "Starting enforcement for Extensions: Chrome=$ChromeExtensionId Edge=
 # [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter','')] param([string]$FutureParam)
 # Prefer explicit functional parameters over relying on script scope to satisfy analyzers & improve clarity.
 
-function Get-ManagedStorageBasePaths {
+function Get-ManagedStorageBasePath {
     param(
         [string]$ChromeExtensionId,
         [string]$EdgeExtensionId,
@@ -146,7 +146,7 @@ function Get-ManagedStorageBasePaths {
     )
 }
 
-function Get-DesiredItems {
+function Get-DesiredItem {
     param(
         [string]$Ensure,
         [string]$ChromeExtensionId,
@@ -168,64 +168,73 @@ function Get-DesiredItems {
         [string]$LogoUrl,
         [string]$InstallationMode
     )
-    $bases = Get-ManagedStorageBasePaths `
+    $bases = Get-ManagedStorageBasePath `
         -ChromeExtensionId $ChromeExtensionId `
         -EdgeExtensionId $EdgeExtensionId `
         -ChromeUpdateUrl $ChromeUpdateUrl `
         -EdgeUpdateUrl $EdgeUpdateUrl
     foreach($b in $bases){
+        # Build canonical Present arrays once
+        $brandingKey = Join-Path $b.ManagedKey 'customBranding'
+        $policyItems = @(
+            @{ Path=$b.ManagedKey; Name='showNotifications';    Type='DWord'; Value=$ShowNotifications },
+            @{ Path=$b.ManagedKey; Name='enableValidPageBadge'; Type='DWord'; Value=$EnableValidPageBadge },
+            @{ Path=$b.ManagedKey; Name='enablePageBlocking';   Type='DWord'; Value=$EnablePageBlocking },
+            @{ Path=$b.ManagedKey; Name='enableCippReporting';  Type='DWord'; Value=$EnableCippReporting },
+            @{ Path=$b.ManagedKey; Name='cippServerUrl';        Type='String'; Value=$CippServerUrl },
+            @{ Path=$b.ManagedKey; Name='cippTenantId';         Type='String'; Value=$azureTenantId }, # $azureTenantId Value supplied by Immy environment
+            @{ Path=$b.ManagedKey; Name='customRulesUrl';       Type='String'; Value=$CustomRulesUrl },
+            @{ Path=$b.ManagedKey; Name='updateInterval';       Type='DWord'; Value=$UpdateInterval },
+            @{ Path=$b.ManagedKey; Name='enableDebugLogging';   Type='DWord'; Value=$EnableDebugLogging }
+        )
+        $brandingItems = @(
+            @{ Path=$brandingKey; Name='companyName';  Type='String'; Value=$CompanyName },
+            @{ Path=$brandingKey; Name='productName';  Type='String'; Value=$ProductName },
+            @{ Path=$brandingKey; Name='supportEmail'; Type='String'; Value=$SupportEmail },
+            @{ Path=$brandingKey; Name='primaryColor'; Type='String'; Value=$PrimaryColor },
+            @{ Path=$brandingKey; Name='logoUrl';      Type='String'; Value=$LogoUrl }
+        )
+        $settingsItems = @(
+            @{ Path=$b.SettingsKey; Name='update_url';        Type='String'; Value=$b.UpdateUrl },
+            @{ Path=$b.SettingsKey; Name='installation_mode'; Type='String'; Value=$InstallationMode }
+        )
+
         if($Ensure -eq 'Present'){
-            $policyItems = @(
-                @{ Path=$b.ManagedKey; Name='showNotifications';    Type='DWord'; Value=$ShowNotifications },
-                @{ Path=$b.ManagedKey; Name='enableValidPageBadge'; Type='DWord'; Value=$EnableValidPageBadge },
-                @{ Path=$b.ManagedKey; Name='enablePageBlocking';   Type='DWord'; Value=$EnablePageBlocking },
-                @{ Path=$b.ManagedKey; Name='enableCippReporting';  Type='DWord'; Value=$EnableCippReporting },
-                @{ Path=$b.ManagedKey; Name='cippServerUrl';        Type='String'; Value=$CippServerUrl },
-                @{ Path=$b.ManagedKey; Name='cippTenantId';         Type='String'; Value=$azureTenantId },
-                @{ Path=$b.ManagedKey; Name='customRulesUrl';       Type='String'; Value=$CustomRulesUrl },
-                @{ Path=$b.ManagedKey; Name='updateInterval';       Type='DWord'; Value=$UpdateInterval },
-                @{ Path=$b.ManagedKey; Name='enableDebugLogging';   Type='DWord'; Value=$EnableDebugLogging }
-            )
-            $brandingKey = Join-Path $b.ManagedKey 'customBranding'
-            $brandingItems = @(
-                @{ Path=$brandingKey; Name='companyName';  Type='String'; Value=$CompanyName },
-                @{ Path=$brandingKey; Name='productName';  Type='String'; Value=$ProductName },
-                @{ Path=$brandingKey; Name='supportEmail'; Type='String'; Value=$SupportEmail },
-                @{ Path=$brandingKey; Name='primaryColor'; Type='String'; Value=$PrimaryColor },
-                @{ Path=$brandingKey; Name='logoUrl';      Type='String'; Value=$LogoUrl }
-            )
-            $settingsItems = @(
-                @{ Path=$b.SettingsKey; Name='update_url';        Type='String'; Value=$b.UpdateUrl },
-                @{ Path=$b.SettingsKey; Name='installation_mode'; Type='String'; Value=$InstallationMode }
-            )
             $policyItems + $brandingItems + $settingsItems | ForEach-Object { $_ }
         } else {
-            # For Absent we desire absence – represent by Type 'Absent'
-            @(
-                @{ Path=$b.ManagedKey; Name=''; Type='Absent' ; Value=$null },
-                @{ Path=(Join-Path $b.ManagedKey 'customBranding'); Name=''; Type='Absent'; Value=$null },
-                @{ Path=$b.SettingsKey; Name=''; Type='Absent'; Value=$null }
+            # Transform for Absent: null policy & branding values, block extension, drop update_url
+            $absentPolicy   = $policyItems   | ForEach-Object { @{ Path=$_.Path; Name=$_.Name; Type=$_.Type; Value=$null } }
+            $absentBranding = $brandingItems | ForEach-Object { @{ Path=$_.Path; Name=$_.Name; Type=$_.Type; Value=$null } }
+            $absentSettings = @(
+                @{ Path=$b.SettingsKey; Name='installation_mode'; Type='String'; Value='blocked' },
+                @{ Path=$b.SettingsKey; Name='update_url';        Type='Remove'; Value=$null }
             )
+            $absentPolicy + $absentBranding + $absentSettings | ForEach-Object { $_ }
         }
     }
 }
 
 function Remove-RegistryKeySafe {
-    param([string]$Path)
-    if(Test-Path $Path){
-        Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+    [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
+    param([Parameter(Mandatory,ValueFromPipeline,ValueFromPipelineByPropertyName)][string]$Path)
+    process {
+        if(Test-Path $Path){
+            if($PSCmdlet.ShouldProcess($Path,'Remove registry key recursively')){
+                Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 }
 
 # Input validation beyond attributes
 if($EnableCippReporting -eq 1){
-    if([string]::IsNullOrWhiteSpace($CippServerUrl) -or [string]::IsNullOrWhiteSpace($azureTenantId)){
+    if([string]::IsNullOrWhiteSpace($CippServerUrl) -or [string]::IsNullOrWhiteSpace($azureTenantId)){ # $azureTenantId Value supplied by Immy environment
         throw 'CippServerUrl and CippTenantId must be provided when EnableCippReporting=1.'
     }
 }
 
 # Build desired items once
-$desiredItems = Get-DesiredItems `
+$desiredItems = Get-DesiredItem `
     -Ensure $Ensure `
     -ChromeExtensionId $ChromeExtensionId `
     -EdgeExtensionId $EdgeExtensionId `
@@ -250,7 +259,7 @@ $desiredItems = Get-DesiredItems `
 if($Ensure -eq 'Present'){
     # Use ImmyBot helper pipeline for each required value; it internally interprets $method for test/set
     # Collect boolean results during test phase to determine overall compliance.
-    $valueItems = $desiredItems | Where-Object { $_.Type -ne 'Absent' }
+    $valueItems = $desiredItems
     $results = foreach($item in $valueItems){
         # Some keys (branding) may have empty string values; those are still enforced.
         if($Method -eq 'test'){
@@ -266,29 +275,22 @@ if($Ensure -eq 'Present'){
         return $compliant
     }
 } else { # Ensure = Absent
-    if($Method -eq 'test'){
-    $paths = Get-ManagedStorageBasePaths `
-        -ChromeExtensionId $ChromeExtensionId `
-        -EdgeExtensionId $EdgeExtensionId `
-        -ChromeUpdateUrl $ChromeUpdateUrl `
-        -EdgeUpdateUrl $EdgeUpdateUrl | ForEach-Object { @($_.ManagedKey, (Join-Path $_.ManagedKey 'customBranding'), $_.SettingsKey) } | Select-Object -Unique
-        $existing = $paths | Where-Object { Test-Path $_ }
-        if($existing){
-            Write-Host 'Keys still present that should be removed:'
-            $existing | ForEach-Object { Write-Host " - $_" }
-            return $false
+    # Mirror Present logic but enforce absence using Value=$null with helper.
+    $valueItems = $desiredItems
+    $results = foreach($item in $valueItems){
+        $targetValue = if($item.Name -eq 'installation_mode') { $item.Value } else { $null }
+        if($Method -eq 'test'){
+            Get-WindowsRegistryValue -Path $item.Path -Name $item.Name | RegistryShould-Be -Value $targetValue
         } else {
-            Write-Host 'All policy keys absent as desired.'
-            return $true
+            Get-WindowsRegistryValue -Path $item.Path -Name $item.Name | RegistryShould-Be -Value $targetValue | Out-Null
         }
+    }
+    if($Method -eq 'test'){
+        $compliant = ($results -notcontains $false)
+        if($compliant){ Write-Host 'All extension policy values are absent as desired.' } else { Write-Host 'One or more extension policy values still present.' }
+        return $compliant
     } elseif($Method -eq 'set'){
-        $paths = Get-ManagedStorageBasePaths `
-            -ChromeExtensionId $ChromeExtensionId `
-            -EdgeExtensionId $EdgeExtensionId `
-            -ChromeUpdateUrl $ChromeUpdateUrl `
-            -EdgeUpdateUrl $EdgeUpdateUrl | ForEach-Object { @($_.ManagedKey, (Join-Path $_.ManagedKey 'customBranding'), $_.SettingsKey) } | Select-Object -Unique
-        foreach($p in $paths){ Remove-RegistryKeySafe -Path $p }
-        Write-Host 'Policy keys removed.'
+        Write-Host 'Extension policy values removed and extension blocked via installation_mode.'
     }
 }
 
