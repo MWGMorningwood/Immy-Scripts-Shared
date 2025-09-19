@@ -1,6 +1,6 @@
 switch($method) {
     "test" {
-        Invoke-ImmyCommand { 
+        Invoke-ImmyCommand {
             Try{
                 Test-WSMan -Authentication Default -ErrorAction Stop | Out-Null
                 return $true
@@ -10,8 +10,8 @@ switch($method) {
         }
     }
     "set" {
-        Invoke-ImmyCommand { 
-            WinRM quickconfig -force 
+        Invoke-ImmyCommand {
+            WinRM quickconfig -force
         }
     }
     default {

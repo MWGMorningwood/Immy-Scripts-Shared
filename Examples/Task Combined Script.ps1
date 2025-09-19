@@ -1,6 +1,6 @@
 param(
 [Parameter(Position=0,Mandatory=$True,HelpMessage=@'
-Example task parameter. If you check off "use script params", this will be used in Immy.  
+Example task parameter. If you check off "use script params", this will be used in Immy.
 HelpMessage formatting supports MarkDown.
 '@)]
 [String]$list="stuff1,stuff2" #<- setting the variable here serves as a default for the parameter.

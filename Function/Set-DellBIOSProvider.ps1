@@ -1,6 +1,3 @@
-#$BIOSPath = "PowerManagement\AutoOn"
-#$BIOSValue = "Everyday"
-#$method = "test"
 param (
     [Parameter(Mandatory=$true)]
     [string]$Path,
@@ -9,38 +6,37 @@ param (
     [string]$Value
 )
 
-Ensure-PSModulePresent DellBiosProvider
+Write-Host "Ensuring DellBiosProvider is present"
+Ensure-PSModulePresent -RequiredModules DellBiosProvider -EnsureLatest $false
 
 $BIOSPath = $Path
 $BIOSValue = $Value
 
 switch ($method) {
     "test" {
-        Invoke-ImmyCommand {
+        $BIOSValue_Test = Invoke-ImmyCommand {
             Import-Module DellBIOSProvider
             try{
-                $BIOSValue_Test = (Get-ChildItem -Path "DellSmbios:\$($using:BIOSPath)" -ErrorAction Stop).CurrentValue
+                $Result = (Get-ChildItem -Path "DellSmbios:\$($using:BIOSPath)" -ErrorAction Stop).CurrentValue
+                return $Result
             } catch {
-                Write-Warning "Path failed to resolve. Please check script logs if this is unexpected."
-                Write-Verbose $BIOSValue_Test
-                return $false 
+                Write-Error "Path failed to resolve. $($_.Exception.Message)"
             }
+        }
 
-            #Check actual setting value
-            if ($BIOSValue_Test -eq $using:BIOSValue){
-                Write-Host "Test results indicate success: $BIOSValue_Test"
-                return $true
-            } else {
-                Write-Warning "Test results do not indicate success: $BIOSValue_Test"
-                return $false
-            }
+        #Check actual setting value
+        if ($BIOSValue_Test -eq $BIOSValue){
+            Write-Host "Test results indicate success: $BIOSPath = $BIOSValue_Test"
+            return $true
+        } else {
+            Write-Warning "Test results do not indicate success: $BIOSPath = $BIOSValue_Test"
+            return $false
         }
     }
     "set" {
-        #Enable-DellSMBIOS
+        Write-Host "Setting BIOS Value in DellSmbios:\$BIOSPath to $BIOSValue..."
         Invoke-ImmyCommand {
             Import-Module DellBIOSProvider
-            Write-Host "Setting BIOS Value in DellSmbios:\$($using:BIOSPath)..."
             Set-Item -Path "DellSmbios:\$($using:BIOSPath)" -value $using:BIOSValue
         }
     }
