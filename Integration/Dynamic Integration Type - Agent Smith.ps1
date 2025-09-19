@@ -73,10 +73,7 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsListingClien
 $Integration | Add-DynamicIntegrationCapability -Interface ISupportsListingAgents -GetAgents {
     [CmdletBinding()]
     [OutputType([IProviderAgentDetails[]])]
-    param(
-        [Parameter(Mandatory)]
-        [string[]]$clientIds
-    )
+    param()
     Import-Module AgentSmithAPI
 
     $currentTime = Get-Date
@@ -109,10 +106,7 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsInventoryIde
 $Integration | Add-DynamicIntegrationCapability -Interface ISupportsDynamicVersions -GetDynamicVersions {
     [CmdletBinding()]
     [OutputType([Immybot.Backend.Domain.Models.DynamicVersion[]])]
-    param(
-        [Parameter(Mandatory=$True)]
-        [System.String]$externalClientId
-    )
+    param()
 
     $version = Get-DynamicVersionsFromGitHubUrl `
     -GitHubReleasesUrl "$($IntegrationContext.SmithGitRepoURL)/releases" `
@@ -123,10 +117,7 @@ $Integration | Add-DynamicIntegrationCapability -Interface ISupportsDynamicVersi
 $Integration |  Add-DynamicIntegrationCapability -Interface ISupportsTenantInstallToken -GetTenantInstallToken {
     [CmdletBinding()]
     [OutputType([System.String])]
-    param(
-        [Parameter(Mandatory=$true)]
-        [string]$clientId
-    )
+    param()
     $properties = @{
         secret = $IntegrationContext.SmithRegistrationSecret
         webhook = $IntegrationContext.SmithRegistrationWebhook

@@ -36,7 +36,7 @@ function Test-ScheduledTaskScript {
     } else {
         # The contents are not identical
         $Test_ScheduledTaskScript_result = $false
-        Write-Host "Script on Machine:"  
+        Write-Host "Script on Machine:"
         Write-Host $CurrentScriptContent
         Write-Host "Scripts NOT identical... Proceeding to next step"
     }
@@ -48,7 +48,7 @@ function Set-ScheduledTaskScript {
     Write-Warning "Script did not pass validation, configuring!"
     $Set_ScheduledTaskScript_result = Invoke-ImmyCommand {
         if(-not (test-path $using:scriptDir)){
-            New-Item -Path $using:scriptDir -ItemType Directory | Out-Null 
+            New-Item -Path $using:scriptDir -ItemType Directory | Out-Null
         }
         New-Item $using:scriptPath -Value $using:ScriptContent -force
     }
@@ -89,7 +89,7 @@ switch ($method) {
 
         # Pass the params to the machine directly and build the task
         if(!$Test_ScriptResult){
-            $Set_ScriptResult = Set-ScheduledTaskScript
+            $null = Set-ScheduledTaskScript
             Write-Progress -Activity "Setting Scheduled Task" -CurrentOperation "Enforced configured scriptblock" -PercentComplete 50 -Id 2
         }
         $result = Invoke-ImmyCommand {

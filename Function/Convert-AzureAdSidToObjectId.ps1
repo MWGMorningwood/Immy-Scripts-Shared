@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
 Convert a Azure AD SID to Object ID
- 
+
 .DESCRIPTION
 Converts an Azure AD SID to Object ID.
 Author: Oliver Kieselbach (oliverkieselbach.com)
 The script is provided "AS IS" with no warranties.
- 
+
 .PARAMETER ObjectID
 The SID to convert
 #>

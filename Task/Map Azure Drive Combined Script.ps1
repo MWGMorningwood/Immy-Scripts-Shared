@@ -8,7 +8,7 @@ Enter your storage Access Key or password.
 '@)]
 [Password()]$accessKey,
 [Parameter(Position=2,Mandatory=$True,HelpMessage=@'
-Array of drives to map at logon. Format is as follows:  
+Array of drives to map at logon. Format is as follows:
 | Name         | Value |
 |--------------|-------|
 | `appshares`  | `Q`   |
