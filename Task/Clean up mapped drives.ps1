@@ -9,8 +9,15 @@ param (
 )
 
 $networkDrives = Invoke-ImmyCommand -Context "User" {
-    $result = Get-WmiObject -Query "SELECT * FROM Win32_NetworkConnection"
-    return $result
+    # Switched from deprecated Get-WmiObject to Get-CimInstance (WS-Man & CIM standard compliant)
+    try {
+        $result = Get-CimInstance -ClassName Win32_NetworkConnection -ErrorAction Stop
+        return $result
+    }
+    catch {
+        Write-Error "Failed to retrieve network connections via CIM: $_"
+        @() # Return empty collection on failure to avoid null reference issues later
+    }
 }
 
 switch($method){
