@@ -2,7 +2,7 @@
 .SYNOPSIS
     Compliance Task to enforce (or remove) CyberDrain "Check - Phishing Protection" extension policies for Chrome & Edge using ImmyBot registry helper functions.
 .DESCRIPTION
-    Combined task to deploy https://github.com/CyberDrain/Check
+    Combined task to deploy https://github.com/CyberDrain/Check.
     Uses ImmyBot provided helper cmdlets `Get-WindowsRegistryValue` and `RegistryShould-Be` to automatically perform
     test vs set logic based on `$method` for the Present (enforce) scenario. For Absent we manually ensure keys are
     removed. This eliminates custom diff logic and leans on native ImmyBot compliance primitives.
@@ -126,8 +126,20 @@ Branding: Logo URL. Leave blank to omit.
 )
 
 $ErrorActionPreference = 'Stop'
+Write-Host "Starting enforcement for Extensions: Chrome=$ChromeExtensionId Edge=$EdgeExtensionId Ensure=$Ensure Mode=$InstallationMode"
+
+# NOTE: All parameters are now passed explicitly into functions so PSScriptAnalyzer (PSReviewUnusedParameter)
+# can detect their usage. If you intentionally keep a parameter for future use, you can suppress the rule like:
+# [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter','')] param([string]$FutureParam)
+# Prefer explicit functional parameters over relying on script scope to satisfy analyzers & improve clarity.
 
 function Get-ManagedStorageBasePaths {
+    param(
+        [string]$ChromeExtensionId,
+        [string]$EdgeExtensionId,
+        [string]$ChromeUpdateUrl,
+        [string]$EdgeUpdateUrl
+    )
     @(
         @{ Browser='Chrome'; ManagedKey="HKLM:SOFTWARE\\Policies\\Google\\Chrome\\3rdparty\\extensions\\$ChromeExtensionId\\policy"; SettingsKey="HKLM:SOFTWARE\\Policies\\Google\\Chrome\\ExtensionSettings\\$ChromeExtensionId"; UpdateUrl=$ChromeUpdateUrl },
         @{ Browser='Edge';   ManagedKey="HKLM:SOFTWARE\\Policies\\Microsoft\\Edge\\3rdparty\\extensions\\$EdgeExtensionId\\policy"; SettingsKey="HKLM:SOFTWARE\\Policies\\Microsoft\\Edge\\ExtensionSettings\\$EdgeExtensionId"; UpdateUrl=$EdgeUpdateUrl }
@@ -135,10 +147,34 @@ function Get-ManagedStorageBasePaths {
 }
 
 function Get-DesiredItems {
-    $bases = Get-ManagedStorageBasePaths
+    param(
+        [string]$Ensure,
+        [string]$ChromeExtensionId,
+        [string]$EdgeExtensionId,
+        [string]$ChromeUpdateUrl,
+        [string]$EdgeUpdateUrl,
+        [int]$ShowNotifications,
+        [int]$EnableValidPageBadge,
+        [int]$EnablePageBlocking,
+        [int]$EnableCippReporting,
+        [string]$CippServerUrl,
+        [string]$CustomRulesUrl,
+        [int]$UpdateInterval,
+        [int]$EnableDebugLogging,
+        [string]$CompanyName,
+        [string]$ProductName,
+        [string]$SupportEmail,
+        [string]$PrimaryColor,
+        [string]$LogoUrl,
+        [string]$InstallationMode
+    )
+    $bases = Get-ManagedStorageBasePaths `
+        -ChromeExtensionId $ChromeExtensionId `
+        -EdgeExtensionId $EdgeExtensionId `
+        -ChromeUpdateUrl $ChromeUpdateUrl `
+        -EdgeUpdateUrl $EdgeUpdateUrl
     foreach($b in $bases){
         if($Ensure -eq 'Present'){
-            # Core policy values
             $policyItems = @(
                 @{ Path=$b.ManagedKey; Name='showNotifications';    Type='DWord'; Value=$ShowNotifications },
                 @{ Path=$b.ManagedKey; Name='enableValidPageBadge'; Type='DWord'; Value=$EnableValidPageBadge },
@@ -189,7 +225,27 @@ if($EnableCippReporting -eq 1){
 }
 
 # Build desired items once
-$desiredItems = Get-DesiredItems
+$desiredItems = Get-DesiredItems `
+    -Ensure $Ensure `
+    -ChromeExtensionId $ChromeExtensionId `
+    -EdgeExtensionId $EdgeExtensionId `
+    -ChromeUpdateUrl $ChromeUpdateUrl `
+    -EdgeUpdateUrl $EdgeUpdateUrl `
+    -ShowNotifications $ShowNotifications `
+    -EnableValidPageBadge $EnableValidPageBadge `
+    -EnablePageBlocking $EnablePageBlocking `
+    -EnableCippReporting $EnableCippReporting `
+    -CippServerUrl $CippServerUrl `
+    -CippTenantId $CippTenantId `
+    -CustomRulesUrl $CustomRulesUrl `
+    -UpdateInterval $UpdateInterval `
+    -EnableDebugLogging $EnableDebugLogging `
+    -CompanyName $CompanyName `
+    -ProductName $ProductName `
+    -SupportEmail $SupportEmail `
+    -PrimaryColor $PrimaryColor `
+    -LogoUrl $LogoUrl `
+    -InstallationMode $InstallationMode
 
 if($Ensure -eq 'Present'){
     # Use ImmyBot helper pipeline for each required value; it internally interprets $method for test/set
@@ -211,7 +267,11 @@ if($Ensure -eq 'Present'){
     }
 } else { # Ensure = Absent
     if($Method -eq 'test'){
-        $paths = Get-ManagedStorageBasePaths | ForEach-Object { @($_.ManagedKey, (Join-Path $_.ManagedKey 'customBranding'), $_.SettingsKey) } | Select-Object -Unique
+    $paths = Get-ManagedStorageBasePaths `
+        -ChromeExtensionId $ChromeExtensionId `
+        -EdgeExtensionId $EdgeExtensionId `
+        -ChromeUpdateUrl $ChromeUpdateUrl `
+        -EdgeUpdateUrl $EdgeUpdateUrl | ForEach-Object { @($_.ManagedKey, (Join-Path $_.ManagedKey 'customBranding'), $_.SettingsKey) } | Select-Object -Unique
         $existing = $paths | Where-Object { Test-Path $_ }
         if($existing){
             Write-Host 'Keys still present that should be removed:'
@@ -222,7 +282,11 @@ if($Ensure -eq 'Present'){
             return $true
         }
     } elseif($Method -eq 'set'){
-        $paths = Get-ManagedStorageBasePaths | ForEach-Object { @($_.ManagedKey, (Join-Path $_.ManagedKey 'customBranding'), $_.SettingsKey) } | Select-Object -Unique
+        $paths = Get-ManagedStorageBasePaths `
+            -ChromeExtensionId $ChromeExtensionId `
+            -EdgeExtensionId $EdgeExtensionId `
+            -ChromeUpdateUrl $ChromeUpdateUrl `
+            -EdgeUpdateUrl $EdgeUpdateUrl | ForEach-Object { @($_.ManagedKey, (Join-Path $_.ManagedKey 'customBranding'), $_.SettingsKey) } | Select-Object -Unique
         foreach($p in $paths){ Remove-RegistryKeySafe -Path $p }
         Write-Host 'Policy keys removed.'
     }
