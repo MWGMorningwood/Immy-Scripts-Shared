@@ -12,18 +12,20 @@ switch ($method) {
     }
     "test" {
         $Current_Feature_State = Invoke-ImmyCommand { $feature = Get-WindowsOptionalFeature -FeatureName $using:Feature -Online; [string]$feature.State }
-        $Feature_Test = ($Current_Feature_State -eq $State)   
+        $Feature_Test = ($Current_Feature_State -eq $State)
         return $Feature_Test
     }
     "set" {
         If ($State -eq 'Disabled') {
-            Invoke-ImmyCommand { $result = Disable-WindowsOptionalFeature -Online -FeatureName $using:Feature; return $result }
-            Write-Host "$Feature has been disabled."
+            Invoke-ImmyCommand -Timeout 600 { $result = Disable-WindowsOptionalFeature -Online -FeatureName $using:Feature; return $result }
+            Write-Host "$Feature has been $State."
+            Restart-ComputerAndWait
         } elseif ($State -eq 'Enabled') {
-            Invoke-ImmyCommand { $result = Enable-WindowsOptionalFeature -Online -FeatureName $using:Feature -all; return $result }
-            Write-Host "$Feature has been disabled."
+            Invoke-ImmyCommand -Timeout 600 { $result = Enable-WindowsOptionalFeature -Online -FeatureName $using:Feature -all -norestart; return $result }
+            Write-Host "$Feature has been $State."
+            Restart-ComputerAndWait
         } else {
-            Write-Host "$Feature has already been disabled."
+            Write-Host "$Feature has already been $State."
         }
     }
 }

@@ -78,7 +78,7 @@ Set LAN Manager authentication level
 [See the Documentation](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/network-security-lan-manager-authentication-level)
 
 * `0` = Send LM & NTLM responses
-* `1` = Send LM & NTLM – use NTLMv2 session security if negotiated
+* `1` = Send LM & NTLM - use NTLMv2 session security if negotiated
 * `2` = Send NTLM response only
 * `3` = Send NTLMv2 response only
 * `4` = Send NTLMv2 response only. Refuse LM
