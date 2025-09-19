@@ -48,7 +48,11 @@ function Get-SmithAgent {
 
         .EXAMPLE
         PS> Get-SmithAgent
-        @{agent1, agent2, agent3}
+        @(
+            @{ Name = "Agent1"; Id = 123 },
+            @{ Name = "Agent2"; Id = 456 },
+            @{ Name = "Agent3"; Id = 789 }
+        )
     #>
     try {
         $headers = @{
