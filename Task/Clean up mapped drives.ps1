@@ -29,13 +29,14 @@ switch($method){
                     $allPermitted = $false
                     Write-Host "Non-permitted network drive found:" $drive.LocalName
                 } else {
-                    Write-Host "Permitted network drive:" $drive.LocalName
+                    Write-Host "Permitted network drive found:" $drive.LocalName
                 }
             }
             return $allPermitted
         }
     }
     "set"{
+        Write-Host "Enforcing permitted network drives: $PermittedDrives"
         Invoke-ImmyCommand -Context "User" {
             foreach ($drive in $using:networkDrives) {
                 if ($using:PermittedDrives -notcontains $drive.LocalName) {
