@@ -214,18 +214,6 @@ function Get-DesiredItem {
     }
 }
 
-function Remove-RegistryKeySafe {
-    [CmdletBinding(SupportsShouldProcess=$true, ConfirmImpact='High')]
-    param([Parameter(Mandatory,ValueFromPipeline,ValueFromPipelineByPropertyName)][string]$Path)
-    process {
-        if(Test-Path $Path){
-            if($PSCmdlet.ShouldProcess($Path,'Remove registry key recursively')){
-                Remove-Item -Path $Path -Recurse -Force -ErrorAction SilentlyContinue
-            }
-        }
-    }
-}
-
 # Input validation beyond attributes
 if($EnableCippReporting -eq 1){
     if([string]::IsNullOrWhiteSpace($CippServerUrl) -or [string]::IsNullOrWhiteSpace($azureTenantId)){ # $azureTenantId Value supplied by Immy environment
