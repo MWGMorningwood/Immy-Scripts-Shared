@@ -104,7 +104,7 @@ switch ($method) {
 
             # Check if the task exists and remove it if it does
             if (![string]::IsNullOrWhiteSpace($using:task)){
-                Unregister-ScheduledTask -TaskName $using:TaskName -Confirm:$false 
+                Unregister-ScheduledTask -TaskName $using:TaskName -Confirm:$false
             }
             # Build the task
             $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-ExecutionPolicy Bypass -NonInteractive -WindowStyle Hidden -file `"$using:scriptPath`""

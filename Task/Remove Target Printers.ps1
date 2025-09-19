@@ -1,8 +1,8 @@
 param(
 [Parameter(Position=0,Mandatory=$True,HelpMessage=@'
-Comma-separated list of printer names to remove.  
+Comma-separated list of printer names to remove.\
 You can obtain this list with `Get-Printer | Select-Object -ExpandProperty Name`
-'@)]
+'@)] # Backslash is an acceptable line break in markdown, allowing satisfaction of PSAvoidTrailingWhitespace
 [String]$list
 )
 $printerNamesToCheck = $list -split ','
