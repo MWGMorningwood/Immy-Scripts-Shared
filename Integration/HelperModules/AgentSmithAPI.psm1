@@ -14,7 +14,7 @@ function Get-SmithOrgID {
 
         .EXAMPLE
         PS> Get-SmithOrgID
-        @{123456, 789012, 345678}
+        @(123456, 789012, 345678)
     #>
 
     try {
