@@ -15,7 +15,7 @@ switch ($method) {
             } catch {
                 Write-Warning "Path failed to resolve. Please check script logs if this is unexpected."
                 Write-Verbose $BIOSValue_Test
-                return $false 
+                return $false
             }
 
             #Check actual setting value
