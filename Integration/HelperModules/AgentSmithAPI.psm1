@@ -10,7 +10,7 @@ function Get-SmithOrgID {
         None. You can't pipe objects to Get-SmithOrgID.
 
         .OUTPUTS
-        System.Object[]    Get-SmithOrgID returns a list of organization IDs.
+        System.Object[]. Get-SmithOrgID returns a list of organization IDs.
 
         .EXAMPLE
         PS> Get-SmithOrgID
@@ -44,7 +44,7 @@ function Get-SmithAgent {
         None. You can't pipe objects to Get-SmithAgent.
 
         .OUTPUTS
-        System.Object[]    Get-SmithAgent returns a list of agents.
+        System.Object[]. Get-SmithAgent returns a list of agents.
 
         .EXAMPLE
         PS> Get-SmithAgent
@@ -83,7 +83,7 @@ function Invoke-SmithCommand {
         None. You can't pipe objects to Invoke-SmithCommand.
 
         .OUTPUTS
-        System.String    Invoke-SmithCommand returns the response from the command execution.
+        System.String. Invoke-SmithCommand returns the response from the command execution.
 
         .EXAMPLE
         PS> Invoke-SmithCommand -agent "agent1" -scriptCode "Get-Process"
@@ -127,7 +127,7 @@ function Get-SmithAPIHealth {
         None. You can't pipe objects to Get-SmithAPIHealth.
 
         .OUTPUTS
-        .HealthResult    Get-SmithAPIHealth returns a HealthResult indicating the health status of the API.
+        HealthResult. Get-SmithAPIHealth returns a HealthResult indicating the health status of the API.
 
         .EXAMPLE
         PS> Get-SmithAPIHealth
