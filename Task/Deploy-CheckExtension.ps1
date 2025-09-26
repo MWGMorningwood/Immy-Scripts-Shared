@@ -26,6 +26,9 @@
     For Immy purposes, add this script as a Combined Task with Script Parameters enabled.
     Returns [bool] during test phase. In set phase writes summary output (Absent) or relies on helper output (Present).
     Validates inputs (color hex, interval range). All registry writes are HKLM so run in System context.
+
+    Script courtesy of https://github.com/MWGMorningwood/
+
 #>
 [CmdletBinding(SupportsShouldProcess=$false)]
 param(
@@ -106,10 +109,16 @@ Enable Debug Logging. Maps to "Enable Debug Logging" in Activity Log settings.
 | `0`   | Disabled             |
 | `1`   | Enabled (default)    |
 '@)][ValidateSet(0,1)][int]$EnableDebugLogging = 1,
+    [Parameter(HelpMessage=@'
+A list of URLs that will completely bypass blocking. Entering **ANY** will decrease security on that website significantly.
+'@)][string[]]$urlAllowlist,
 
     [Parameter(HelpMessage=@'
 Branding: Company Name shown in extension UI.
 '@)][string]$CompanyName  = 'CyberDrain',
+    [Parameter(HelpMessage=@'
+Branding: Company URL shown in extension UI.
+'@)][string]$CompanyUrl   = 'https://cyberdrain.com/',
     [Parameter(HelpMessage=@'
 Branding: Product Name shown in extension UI.
 '@)][string]$ProductName  = 'Check - Phishing Protection',
@@ -161,7 +170,9 @@ function Get-DesiredItem {
         [string]$CustomRulesUrl,
         [int]$UpdateInterval,
         [int]$EnableDebugLogging,
+        [string[]]$urlAllowlist,
         [string]$CompanyName,
+        [string]$CompanyUrl,
         [string]$ProductName,
         [string]$SupportEmail,
         [string]$PrimaryColor,
@@ -186,9 +197,11 @@ function Get-DesiredItem {
             @{ Path=$b.ManagedKey; Name='customRulesUrl';       Type='String'; Value=$CustomRulesUrl },
             @{ Path=$b.ManagedKey; Name='updateInterval';       Type='DWord'; Value=$UpdateInterval },
             @{ Path=$b.ManagedKey; Name='enableDebugLogging';   Type='DWord'; Value=$EnableDebugLogging }
+            @{ Path=$b.ManagedKey; Name='urlAllowlist';         Type='MultiString'; Value=$urlAllowlist }
         )
         $brandingItems = @(
             @{ Path=$brandingKey; Name='companyName';  Type='String'; Value=$CompanyName },
+            @{ Path=$brandingKey; Name='companyURL';   Type='String'; Value=$CompanyUrl },
             @{ Path=$brandingKey; Name='productName';  Type='String'; Value=$ProductName },
             @{ Path=$brandingKey; Name='supportEmail'; Type='String'; Value=$SupportEmail },
             @{ Path=$brandingKey; Name='primaryColor'; Type='String'; Value=$PrimaryColor },
@@ -237,7 +250,9 @@ $desiredItems = Get-DesiredItem `
     -CustomRulesUrl $CustomRulesUrl `
     -UpdateInterval $UpdateInterval `
     -EnableDebugLogging $EnableDebugLogging `
+    -urlAllowlist $urlAllowlist `
     -CompanyName $CompanyName `
+    -CompanyUrl $CompanyUrl `
     -ProductName $ProductName `
     -SupportEmail $SupportEmail `
     -PrimaryColor $PrimaryColor `
