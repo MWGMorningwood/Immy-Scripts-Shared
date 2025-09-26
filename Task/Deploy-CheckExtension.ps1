@@ -197,7 +197,7 @@ function Get-DesiredItem {
             @{ Path=$b.ManagedKey; Name='customRulesUrl';       Type='String'; Value=$CustomRulesUrl },
             @{ Path=$b.ManagedKey; Name='updateInterval';       Type='DWord'; Value=$UpdateInterval },
             @{ Path=$b.ManagedKey; Name='enableDebugLogging';   Type='DWord'; Value=$EnableDebugLogging }
-            @{ Path=$b.ManagedKey; Name='urlAllowlist';         Type='DWord'; Value=$urlAllowlist }
+            @{ Path=$b.ManagedKey; Name='urlAllowlist';         Type='MultiString'; Value=$urlAllowlist }
         )
         $brandingItems = @(
             @{ Path=$brandingKey; Name='companyName';  Type='String'; Value=$CompanyName },
